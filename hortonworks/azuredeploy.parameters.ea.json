@@ -1,0 +1,33 @@
+{
+    "deploymentName": {
+        "value": "neu-hw204"
+    },
+    "storageAccountName": {
+        "value": "neuhw204"
+    },        
+    "location": {
+        "value": "East Asia"
+    },
+    "dnsNameForPublicIP" : {
+        "value": "neu-hw204"
+    },
+    "vmSize": {
+        "value": "Standard_A4"
+    },
+    "tshirtSize": {
+        "value": "Eval"
+    },
+    "scriptsUri": {
+        "value": "https://neudesicarmfiles.blob.core.windows.net/staticfilestorage/hortonworks"
+    },
+    "keyVaultResourceGroup": {
+        "value": "AzureRM-Util-EA"
+    },
+    "keyVaultName": {
+        "value": "AzureRM-Keys-EA"
+    },
+    "keyUri": {
+        "value": "https://azurerm-keys-ea.vault.azure.net/secrets/sshKey/e310db3aadac487880f46dc6bf7a7345"
+/*        "value": "https://azurerm-keys-ea2.vault.azure.net/secrets/sshKey/8fb2a44398fd4d5baf02d341338548e9" */
+    }
+}

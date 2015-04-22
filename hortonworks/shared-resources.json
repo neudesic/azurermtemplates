@@ -1,0 +1,49 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",            
+            "metadata": {
+                "Description": "Location where resources will be provisioned"
+            }
+        },
+        "networkSpec": {
+            "type": "object"
+        }
+    },
+    "variables": {
+    },
+    "resources": [        
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "clouderaClusterAS",
+            "location": "[parameters('location')]",
+            "properties": {
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('networkSpec').virtualNetworkName]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('networkSpec').privateIPPrefix, '0/24')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('networkSpec').virtualNetworkSubnetName]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('networkSpec').privateIPPrefix, '0/24')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+
