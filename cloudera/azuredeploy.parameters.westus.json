@@ -1,0 +1,30 @@
+{
+    "deploymentName": {
+        "value": "hortonworks"
+    },
+    "storageAccountName": {
+        "value": "neudesichortonworks10"
+    },        
+    "location": {
+        "value": "West US"
+    },
+    "dnsNameForPublicIP" : {
+        "value": "neudesichortonworks10"
+    },
+    "vmSize": {
+        "value": "Standard_A3"
+    },
+    "scriptsUri": {
+        "value": "https://neudesicarmfiles.blob.core.windows.net/staticfilestorage/cloudera"
+    },
+    "keyVaultResourceGroup": {
+        "value": "AzureRM-Util"
+    },
+    "keyVaultName": {
+        "value": "AzureRM-Keys"
+    },
+    "keyUri": {
+        "value": "https://azurerm-keys.vault.azure.net/secrets/sshKey/29a10ecf43b64c7ab7eace8866d64597"
+/*        "value": "https://azurerm-keys-ea2.vault.azure.net/secrets/sshKey/8fb2a44398fd4d5baf02d341338548e9"*/
+    }
+}
