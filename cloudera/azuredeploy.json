@@ -39,8 +39,8 @@
             "allowedValues": [ 
                 "Eval",
                 "S", 
-                "M", 
-                "L" 
+                "M"/*, 
+                "L" */
             ], 
             "metadata": { 
                 "Description": "T-shirt size of the Couchbase cluster" 
@@ -94,17 +94,17 @@
             "dataNodeCount": 3            
         },
         "clusterTshirtSizeS": {
-            "nameNodeCount": 1,
-            "dataNodeCount": 1            
+            "nameNodeCount": 2,
+            "dataNodeCount": 7            
         },
         "clusterTshirtSizeM": {
-            "nameNodeCount": 1,
-            "dataNodeCount": 1            
+            "nameNodeCount": 2,
+            "dataNodeCount": 50            
         },
-        "clusterTshirtSizeL": {
-            "nameNodeCount": 1,
-            "dataNodeCount": 1            
-        },
+        /*"clusterTshirtSizeL": {
+            "nameNodeCount": 2,
+            "dataNodeCount": 300            
+        },*/
         "clusterSpec": "[variables(concat('clusterTshirtSize', parameters('tshirtSize')))]",        
         "vmSpec": {
             "vmSize": "[parameters('vmSize')]",
