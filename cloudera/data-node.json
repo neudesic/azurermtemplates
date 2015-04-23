@@ -2,7 +2,7 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "deploymentName": {
+        "dnsNamePrefix": {
             "type": "string"
         },
         "location": {
@@ -25,7 +25,7 @@
         }
     },
     "variables": {
-        "vmName": "[concat(parameters('deploymentName'), '-DN')]",
+        "vmName": "[concat(parameters('dnsNamePrefix'), '-dn')]",
         "nicName": "[concat(variables('vmName'), '-nic')]",
         "storageAccountName": "[concat(parameters('storageAccount').prefix, 'dn')]",
 
@@ -61,7 +61,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('networkSpec').dnsPrefix, 'dn', copyIndex())]"
+                    "domainNameLabel": "[concat(parameters('dnsNamePrefix'), '-dn', copyIndex())]"
                 }
             }
         }, 

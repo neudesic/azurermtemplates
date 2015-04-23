@@ -1,15 +1,12 @@
 {
-    "deploymentName": {
-        "value": "cloudera"
+    "dnsNamePrefix": {
+        "value": "neu-cld25"
     },
-    "storageAccountName": {
-        "value": "neudesiccloudera238"
+    "storageAccountPrefix": {
+        "value": "neucld25"
     },        
     "location": {
         "value": "East Asia"
-    },
-    "dnsNameForPublicIP" : {
-        "value": "neudesiccloudera238"
     },
     "vmSize": {
         "value": "Standard_D14"
@@ -28,6 +25,5 @@
     },
     "keyUri": {
         "value": "https://azurerm-keys-ea.vault.azure.net/secrets/sshKey/e310db3aadac487880f46dc6bf7a7345"
-/*        "value": "https://azurerm-keys-ea2.vault.azure.net/secrets/sshKey/8fb2a44398fd4d5baf02d341338548e9" */
     }
 }

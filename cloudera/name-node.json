@@ -2,7 +2,7 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "deploymentName": {
+        "dnsNamePrefix": {
             "type": "string"
         },
         "location": {
@@ -25,11 +25,11 @@
         }
     },
     "variables": {
-        "nicName": "[concat(parameters('deploymentName'), '-NN-nic')]",
-        "vmName": "[concat(parameters('deploymentName'), '-NN')]",
-        "storageAccountName": "[concat(parameters('storageAccount').prefix, 'nn')]",
-
+        "vmName": "[concat(parameters('dnsNamePrefix'), '-nn')]",
+        "nicName": "[concat(variables('vmName'), '-nic')]",
         "publicIPAddressName": "[concat(variables('vmName'), '-publicIP')]",
+
+        "storageAccountName": "[concat(parameters('storageAccount').prefix, 'nn')]",
 
         /* this will go away when the public key comes from the key vault */
         "sshKeyPath": "[concat('/home/',parameters('vmSpec').adminUserName,'/.ssh/authorized_keys')]",        
@@ -61,7 +61,7 @@
             "properties": { 
                 "publicIPAllocationMethod": "Dynamic", 
                 "dnsSettings": { 
-                    "domainNameLabel": "[concat(parameters('networkSpec').dnsPrefix, 'nn', copyIndex())]" 
+                    "domainNameLabel": "[concat(parameters('dnsNamePrefix'), 'nn', copyIndex())]" 
                 } 
             } 
         }, 
@@ -117,7 +117,7 @@
                     "linuxConfiguration" : {
                         "disablePasswordAuthentication": "true",
                         "ssh" : { 
-                            "publicKeys" : [{ 
+                            "publicKeys" : [{                                 
                                 "path" : "[variables('sshKeyPath')]", 
                                 "keyData" : "[variables('sshKeyData')]" 
                             }] 

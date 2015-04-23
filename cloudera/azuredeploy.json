@@ -2,14 +2,14 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters" : {
-        "deploymentName": {
+        "dnsNamePrefix": {
             "type": "string",
             "defaultValue": "cloudera",
             "metadata": {
                 "Description": "Unique name for the deployment that will be used as the base name for resources"
             }
         },
-        "storageAccountName": {
+        "storageAccountPrefix": {
             "type": "string",
             "defaultValue": "azurermtest22",
             "metadata": {
@@ -28,10 +28,6 @@
             "metadata": {
                 "Description": "Location where resources will be provisioned"
             }
-        },
-        "dnsNameForPublicIP" : {
-            "type" : "string",
-            "defaultValue": "neudesichortonworks1"
         },
         "tshirtSize": { 
             "type": "string", 
@@ -76,17 +72,9 @@
             "defaultValue": "https://azurerm-keys.vault.azure.net/secrets/sshKey/29a10ecf43b64c7ab7eace8866d64597"
         }
     },
-    "variables": {
-        "keyVaultResourceId": "[resourceId(parameters('keyVaultResourceGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-        "virtualNetworkName": "[concat(parameters('deploymentName'), '-vnet')]",
-        "subnetName":"[concat(parameters('deploymentName'), '-subnet')]",
-        "addressPrefix":"10.0.0.0/24",
-        "subnetPrefix":"10.0.0.0/24",
-        "masterNodePrivateIPAddress": "10.0.0.50",
-        "nameNodePrivateIPAddressPrefix": "10.0.0.10", /* Range of .100 - .109, max of 10 */
-        "dataNodePrivateIPAddressPrefix": "10.0.0.1", /* Ranges of .10 - .19 & .110 - .199, max of 100 */
+    "variables": {                
         "storageAccount": {
-            "prefix": "[parameters('storageAccountName')]",
+            "prefix": "[parameters('storageAccountPrefix')]",
             "type": "[parameters('storageAccountType')]"
         },
         "clusterTshirtSizeEval": {
@@ -109,7 +97,6 @@
         "vmSpec": {
             "vmSize": "[parameters('vmSize')]",
             "privateIPAddressPrefix": "10.0.0.",
-            "dnsNamePrefix": "[parameters('dnsNameForPublicIP')]",
             "adminUserName": "[parameters('adminUserName')]",
             "adminPassword": "[parameters('adminPassword')]",
             "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150128')]",
@@ -117,13 +104,12 @@
             "keyUri": "[parameters('keyUri')]"
         },
         "networkSpec": {
-            "dnsPrefix": "[parameters('dnsNameForPublicIP')]",
             "privateIPPrefix": "10.0.0.",
             "masterNodeAddress": "9",
             "nameNodeAddressStart": 10,
             "dataNodeAddressStart": 20,
-            "virtualNetworkName": "[concat(parameters('deploymentName'), '-vnet')]",
-            "virtualNetworkSubnetName": "[concat(parameters('deploymentName'), '-subnet')]"
+            "virtualNetworkName": "[concat(parameters('dnsNamePrefix'), '-vnet')]",
+            "virtualNetworkSubnetName": "[concat(parameters('dnsNamePrefix'), '-subnet')]"
         }
     },
     "resources": [
@@ -161,8 +147,8 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "deploymentName": {
-                        "value": "[parameters('deploymentName')]"
+                    "dnsNamePrefix": {
+                        "value": "[parameters('dnsNamePrefix')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -199,8 +185,8 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "deploymentName": {
-                        "value": "[parameters('deploymentName')]"
+                    "dnsNamePrefix": {
+                        "value": "[parameters('dnsNamePrefix')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -228,7 +214,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
             "dependsOn": [                
-                "Microsoft.Resources/deployments/shared-resources"
+                "Microsoft.Resources/deployments/data-node",
+                "Microsoft.Resources/deployments/name-node"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -237,11 +224,14 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "deploymentName": {
-                        "value": "[parameters('deploymentName')]"
+                    "dnsNamePrefix": {
+                        "value": "[parameters('dnsNamePrefix')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
+                    },
+                    "scriptsUri": {
+                        "value": "[parameters('scriptsUri')]"
                     },
                     "storageAccount" : {
                         "value": "[variables('storageAccount')]"        
@@ -251,33 +241,10 @@
                     },
                     "networkSpec" : {
                         "value": "[variables('networkSpec')]"
+                    },
+                    "clusterSpec" : {
+                        "value": "[variables('clusterSpec')]"
                     }            
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('deploymentName'), '-MN', '/prepareDisks')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "Microsoft.Resources/deployments/name-node",
-                "Microsoft.Resources/deployments/data-node",
-                "Microsoft.Resources/deployments/master-node"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [
-                        "[concat(parameters('scriptsUri'), '/initialize_master.sh')]",                        
-                        "[concat(parameters('scriptsUri'), '/scripts/prepareDisks.sh')]",
-                        "[concat(parameters('scriptsUri'), '/scripts/bootstrap-cloudera.sh')]",
-                        "[concat(parameters('scriptsUri'), '/scripts/initialize-cloudera-server.sh')]",
-                        "[concat(parameters('scriptsUri'), '/scripts/cmxDeployOnIbiza.py')]"
-                    ],
-                    "commandToExecute": "[concat('sh initialize_master.sh \"', variables('networkSpec').privateIPPrefix, '\" \"', parameters('deploymentName'), '\" ', variables('clusterSpec').nameNodeCount, ' ', variables('clusterSpec').dataNodeCount, ' \"', variables('vmSpec').adminUserName, '\"')]"                    
                 }
             }
         }
