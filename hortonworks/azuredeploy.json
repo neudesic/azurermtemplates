@@ -278,10 +278,9 @@
                 "settings": {
                     "fileUris": [
                         "[concat(parameters('scriptsUri'), '/scripts/initialize-master.sh')]",                        
-                        "[concat(parameters('scriptsUri'), '/scripts/prepareDisks.sh')]",
                         "[concat(parameters('scriptsUri'), '/scripts/vm-bootstrap.py')]"
                     ],
-                    "commandToExecute": "[concat('sh initialize-master.sh \"', variables('networkSpec').privateIPPrefix, '\" \"', parameters('deploymentName'), '\" ', variables('clusterSpec').nameNodeCount, ' ', variables('clusterSpec').dataNodeCount, ' \"', variables('vmSpec').adminUserName, '\"')]"                    
+                    "commandToExecute": "[concat('sh initialize-master.sh \"', variables('networkSpec').privateIPPrefix, '\" \"', parameters('deploymentName'), '\" \".eastasia.cloudapp.azure.com\" ', variables('clusterSpec').nameNodeCount, ' ', variables('clusterSpec').dataNodeCount, ' \"', variables('vmSpec').adminUserName, '\"')]"                    
                 }
             }
         }

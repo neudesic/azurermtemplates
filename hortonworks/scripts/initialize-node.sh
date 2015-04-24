@@ -8,8 +8,6 @@ DATANODES=$5
 #disable the need for a tty when running sudo
 sed -i '/Defaults[[:space:]]\+!*requiretty/s/^/#/' /etc/sudoers
 
-sh ./prepareDisks.sh
-
 #TODO: pull in public key from waagent folder
 
 # Disable SELinux
@@ -36,7 +34,7 @@ MASTER_NODES=()
 for i in $(seq 1 $MASTERNODES)
 do 
   let "IP=i+8"
-  MASTER_NODES+=("$IPPREFIX.$IP")
+  MASTER_NODES+=("$IPPREFIX$IP")
 done
 IFS=',';MASTER_NODE_IPS="${MASTER_NODES[*]}";IFS=$' \t\n'
 
@@ -44,7 +42,7 @@ WORKER_NODES=()
 for i in $(seq 1 $DATANODES)
 do 
   let "IP=i+19"
-  WORKER_NODES+=("$IPPREFIX.$IP")
+  WORKER_NODES+=("$IPPREFIX$IP")
 done
 IFS=',';WORKER_NODE_IPS="${WORKER_NODES[*]}";IFS=$' \t\n'
 

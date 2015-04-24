@@ -14,6 +14,5 @@ Set-AzureStorageBlobContent -Blob "hortonworks\name-node.json" -Container $conta
 Set-AzureStorageBlobContent -Blob "hortonworks\data-node.json" -Container $container.Name -File ".\data-node.json" -Context $context -Force
 Set-AzureStorageBlobContent -Blob "hortonworks\scripts\initialize-master.sh" -Container $container.Name -File ".\scripts\initialize-master.sh" -Context $context -Force
 
-Set-AzureStorageBlobContent -Blob "hortonworks\scripts\prepareDisks.sh" -Container $container.Name -File ".\scripts\prepareDisks.sh" -Context $context -Force
 Set-AzureStorageBlobContent -Blob "hortonworks\scripts\initialize-node.sh" -Container $container.Name -File ".\scripts\initialize-node.sh" -Context $context -Force
 Set-AzureStorageBlobContent -Blob "hortonworks\scripts\vm-bootstrap.py" -Container $container.Name -File ".\scripts\vm-bootstrap.py" -Context $context -Force

@@ -176,7 +176,6 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "[concat(parameters('scriptsUri'), '/scripts/prepareDisks.sh')]",
                         "[concat(parameters('scriptsUri'), '/scripts/initialize-node.sh')]",
                         "[concat(parameters('scriptsUri'), '/scripts/vm-bootstrap.py')]"
                     ],

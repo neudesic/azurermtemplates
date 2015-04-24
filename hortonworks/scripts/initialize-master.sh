@@ -1,14 +1,13 @@
 #!/bin/bash
 IPPREFIX=$1
 NAMEPREFIX=$2
-NAMENODES=$3
-DATANODES=$4
-ADMINUSER=$5
+NAMESUFFIX=$3 # '.eastasia.cloudapp.azure.com'
+NAMENODES=$4
+DATANODES=$5
+ADMINUSER=$6
 
 #disable the need for a tty when running sudo
 sed -i '/Defaults[[:space:]]\+!*requiretty/s/^/#/' /etc/sudoers
-
-sh ./prepareDisks.sh
 
 #use the key from the key vault as the SSH private key
 openssl rsa -in /var/lib/waagent/*.prv -out /home/$ADMINUSER/.ssh/id_rsa
@@ -20,7 +19,7 @@ chown $ADMINUSER /home/$ADMINUSER/.ssh/id_rsa
 sed -i s/SELINUX=enforcing/SELINUX=disabled/ /etc/selinux/config
 
 # Do not start iptables on boot
-# chkconfig iptables off - disabled unless we really need it
+chkconfig iptables off
 
 # Start ntpd on boot
 chkconfig ntpd on 
@@ -40,27 +39,22 @@ sudo ambari-server setup -s
 
 #TODO: pull in public key from waagent folder
 
-#Generate IP Addresses for the cloudera setup
-#NODES=()
+let "MASTERNODES=NAMENODES+1"
 
-#let "NAMEEND=NAMENODES-1"
-#for i in $(seq 0 $NAMEEND)
-#do 
- # let "IP=i+10"
- # NODES+=("10.0.0.$IP:${NAMEPREFIX}-NN$i:${NAMEPREFIX}-NN$i")
-#done
+MASTER_NODES=()
+for i in $(seq 1 $MASTERNODES)
+do 
+  let "IP=i+8"
+  MASTER_NODES+=("$IPPREFIX$IP")
+done
+IFS=',';MASTER_NODE_IPS="${MASTER_NODES[*]}";IFS=$' \t\n'
 
-#let "DATAEND=DATANODES-1"
-#for i in $(seq 0 $DATAEND)
-#do 
-#  let "IP=i+20"
-#  NODES+=("10.0.0.$IP:${NAMEPREFIX}-DN$i:${NAMEPREFIX}-DN$i")
-#done
+WORKER_NODES=()
+for i in $(seq 1 $DATANODES)
+do 
+  let "IP=i+19"
+  WORKER_NODES+=("$IPPREFIX$IP")
+done
+IFS=',';WORKER_NODE_IPS="${WORKER_NODES[*]}";IFS=$' \t\n'
 
-#IFS=',';NODE_IPS="${NODES[*]}";IFS=$' \t\n'
-
-#echo $NODE_IPS >> /home/$ADMINUSER/node_ips.log
-
-#sh bootstrap-cloudera.sh 'cloudera' "10.0.0.9:${NAMEPREFIX}-MN:${NAMEPREFIX}-MN" $NODE_IPS false testuser >> /home/$ADMINUSER/bootstrap-cloudera.log
-#sh bootstrap-cloudera.sh 'cloudera' '10.0.0.9:cloudera-MN:cloudera-MN' '10.0.0.10:cloudera-NN0:cloudera-NN0,10.0.0.11:cloudera-NN1:cloudera-NN1,10.0.0.20:cloudera-DN0:cloudera-DN0,10.0.0.21:cloudera-DN1:cloudera-DN1,10.0.0.22:cloudera-DN2:cloudera-DN2' false testuser >> /home/$1/bootstrap-cloudera.log
-#sh ./bootstrap-cloudera.sh 'cloudera' '10.0.0.50:cloudera-MN:cloudera-MN' $NODE_IPS false testuser >> /home/$1/bootstrap-cloudera.log
+#sudo python vm-bootstrap.py --action 'bootstrap' --cluster_id $NAMEPREFIX --scenario_id 'evaluation' --num_masters $MASTERNODES --num_workers $DATANODES --master_prefix "$NAMEPREFIX-mn-" --worker_prefix "$NAMEPREFIX-wn-" --domain_name $NAMESUFFIX --admin_password 'admin' --masters_iplist $MASTER_NODE_IPS --workers_iplist $WORKER_NODE_IPS --id_padding 1
